@@ -3,17 +3,27 @@
 using namespace std;
 
 void display(void) {
-    int tileWidth = 10;
-    int tileHeight = 4;
+    int tileWidth = 16;
+    int tileHeight = 8;
     glClear (GL_COLOR_BUFFER_BIT);
     for (int i = 0; i < 5; i++) { // height of the map
         for (int j = 0; j < 5; j++) { // width of the map
 
-            int x = j * (tileWidth);
-            int y = i * (tileHeight);
+            if(i % 2 == 0 && j % 2 == 0) {
+                glColor3d (0.5, 0.5, 0.7);
+            } else if (i % 2 != 0 && j % 2 != 0) {
+                glColor3d (0.2, 0.1, 0.4);
+            } else if (i % 2 == 0 && j % 2 != 0) {
+                glColor3d (0.4, 0.8, 0.2);
+            } else {
+                glColor3d (0.1, 0.9, 0.9);
+            }
 
-            int xx = x - y;
-            int yy = (x + y) / 2;
+            int x = j * tileWidth / 2;
+            int y = i * tileHeight;
+
+            int xx = (x - y);
+            int yy = ((x + y) / 2);
 
             cout << "{ x: ";
             cout << xx;
@@ -32,7 +42,7 @@ void display(void) {
         }
     }
 
-    // first line
+    // // first line
 
     // glColor3d (1, 1, 0.7);
 
@@ -68,6 +78,29 @@ void display(void) {
     // glVertex3f (tileWidth/2, tileHeight, 0.0);
     // glVertex3f (tileWidth, tileHeight/2, 0.0);
     // glEnd();
+
+    // for( int a = 0; a < 5; a++) {
+    //     glColor3d (0.2, 0.2, 0.7);
+    //     glBegin(GL_POLYGON);
+    //     glVertex3f (tileWidth/2 + (tileWidth/2)*a, 0.0 + (tileHeight/2) * a, 0.0);
+    //     glVertex3f (0.0 + (tileWidth/2)*a, tileHeight/2 + (tileHeight/2) * a, 0.0);
+    //     glVertex3f (tileWidth/2 + (tileWidth/2) * a, tileHeight + (tileHeight/2) * a, 0.0);
+    //     glVertex3f (tileWidth + (tileWidth/2) * a, tileHeight/2 + (tileHeight/2) * a, 0.0);
+    //     glEnd();
+    // }
+
+
+    // for( int a = 0; a < 5; a++) {
+    //     glColor3d (0.4, 0.3, 0.7);
+    //     glBegin(GL_POLYGON);
+    //     glVertex3f ((tileWidth/2 + (tileWidth/2)*a) + tileWidth/2, (0.0 + (tileHeight/2) * a) + tileHeight/2, 0.0);
+    //     glVertex3f ((0.0 + (tileWidth/2)*a) + tileWidth/2, (tileHeight/2 + (tileHeight/2) * a) + tileHeight/2, 0.0);
+    //     glVertex3f ((tileWidth/2 + (tileWidth/2) * a) + tileWidth/2, (tileHeight + (tileHeight/2) * a) + tileHeight/2, 0.0);
+    //     glVertex3f ((tileWidth + (tileWidth/2) * a) + tileWidth/2, (tileHeight/2 + (tileHeight/2) * a) + tileHeight/2, 0.0);
+    //     glEnd();
+    // }
+
+
 
 
     glFlush ();
