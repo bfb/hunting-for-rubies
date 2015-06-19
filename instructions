@@ -1,0 +1,5 @@
+
+- array de objetos Tile que possuem um x e y (ancora) e uma textura
+- mapa de tiles vai ser um array (vector) de objetos Tile
+- classe view possui as configurações de width e height do tile e cols e rows
+- classe DiamondView (filha de view) possui os metodos renderTileMap, renderTile, getCurrentTile
