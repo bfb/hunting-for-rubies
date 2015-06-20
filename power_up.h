@@ -1,11 +1,14 @@
-class Character {
+class PowerUp {
     public:
-      Character(TileMap *tp, int px, int py, int w, int h, int t){
+      PowerUp(TileMap *tp, int px, int py, int w, int h, int t){
         x = px; y = py;
         width = w; height = h;
         texture = t;
         tileMap = tp;
+
+
       }
+
 
       // current anchor x and y for colision
 
@@ -37,56 +40,6 @@ class Character {
         direction = d;
       }
 
-      // void move(unsigned char direction) {
-      //   switch(direction) {
-      //     case 'N':
-      //       y -= 10;
-      //       break;
-      //     case 'S':
-      //       y += 10;
-      //       break;
-      //     case 'W':
-      //       x -= 10;
-      //       break;
-      //     case 'E':
-      //       x += 10;
-      //       break;
-      //   }
-
-      //   Tile t = tileMap->getNearest(getX(), getY());
-      //   tileY = t.getY();
-      //   tileX = t.getX();
-      // }
-
-      // DIRECTIONS:
-      // - 0 = north
-      // - 1 = east
-      // - 3 = south
-      // - 4 = west
-      void move() {
-        switch(direction) {
-          case 0:
-            y -= 10;
-            break;
-          case 3:
-            y += 10;
-            break;
-          case 1:
-            x -= 10;
-            break;
-          case 4:
-            x += 10;
-            break;
-        }
-
-
-        // find current tile
-        Tile tile = tileMap->getNearest(getX(), getY());
-        tileY = tile.getY();
-        tileX = tile.getX();
-
-      }
-
       void render() {
           // glColor3d (0.5, 0.5, 0.7);
         glBindTexture( GL_TEXTURE_2D, texture);
@@ -105,5 +58,4 @@ class Character {
     private:
       int x, y, width, height, texture, tileX, tileY, direction;
       TileMap *tileMap;
-
 };

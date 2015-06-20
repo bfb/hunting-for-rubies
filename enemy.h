@@ -1,10 +1,14 @@
-class Character {
+class Enemy {
     public:
-      Character(TileMap *tp, int px, int py, int w, int h, int t){
+      Enemy(TileMap *tp, int px, int py, int w, int h, int t){
         x = px; y = py;
         width = w; height = h;
         texture = t;
         tileMap = tp;
+
+        Tile tile = tileMap->getNearest(getX(), getY());
+        tileY = tile.getY();
+        tileX = tile.getX();
       }
 
       // current anchor x and y for colision
@@ -37,27 +41,6 @@ class Character {
         direction = d;
       }
 
-      // void move(unsigned char direction) {
-      //   switch(direction) {
-      //     case 'N':
-      //       y -= 10;
-      //       break;
-      //     case 'S':
-      //       y += 10;
-      //       break;
-      //     case 'W':
-      //       x -= 10;
-      //       break;
-      //     case 'E':
-      //       x += 10;
-      //       break;
-      //   }
-
-      //   Tile t = tileMap->getNearest(getX(), getY());
-      //   tileY = t.getY();
-      //   tileX = t.getX();
-      // }
-
       // DIRECTIONS:
       // - 0 = north
       // - 1 = east
@@ -79,12 +62,29 @@ class Character {
             break;
         }
 
-
         // find current tile
         Tile tile = tileMap->getNearest(getX(), getY());
         tileY = tile.getY();
         tileX = tile.getX();
 
+        if(tileMap->getBoundaryTexture() == tile.getTexture()) {
+          // calculate direction
+          switch(direction) {
+            case 0:
+              direction = 3;
+              break;
+            case 1:
+              direction = 4;
+              break;
+            case 3:
+              direction = 0;
+              break;
+            case 4:
+              direction = 1;
+              break;
+          }
+
+        }
       }
 
       void render() {
@@ -105,5 +105,4 @@ class Character {
     private:
       int x, y, width, height, texture, tileX, tileY, direction;
       TileMap *tileMap;
-
 };

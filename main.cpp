@@ -6,6 +6,7 @@ GLuint texture;
 GLuint texture2;
 GLuint texture3;
 GLuint texture4;
+GLuint textures[10];
 
 Image *image;
 
@@ -18,12 +19,18 @@ int tileHeight = 30;
 int highlightX = 0;
 int highlightY = 0;
 
+// game status
+int gameStatus = 1;
+
+// game components
 Character *character;
-Character *character2;
+Enemy *enemy;
+Tree *tree;
+// PowerUp *powerUp;
 
-GLuint loadImageTexture(std::string filename){
+TileMap *tileMap;
 
-    // ifstream is used for reading files
+void loadTexture(GLuint texture, std::string filename){
     ifstream inf(filename);
 
     // If we couldn't open the output file stream for reading
@@ -66,11 +73,8 @@ GLuint loadImageTexture(std::string filename){
         }
     }
 
-    GLuint texture;
-
-    glGenTextures( 1, &texture );
+    // glGenTextures( texture, textures );
     glBindTexture( GL_TEXTURE_2D, texture );
-
 
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     // glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND);
@@ -79,91 +83,10 @@ GLuint loadImageTexture(std::string filename){
 
     //Generate the texture
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image->getWidth(), image->getHeight(), 0,
-GL_RGBA, GL_UNSIGNED_BYTE, image->getPixels());
+    GL_RGBA, GL_UNSIGNED_BYTE, image->getPixels());
 
-    return texture;
+    free(image);
 }
-
-GLuint LoadTexture( const char * filename, int width, int height )
-{
-    GLuint texture;
-    unsigned char * data;
-    FILE * file;
-
-    //The following code will read in our RAW file
-    file = fopen( filename, "rb" );
-    if ( file == NULL ) return 0;
-    data = (unsigned char *) malloc( width * height * 3 );
-    fread( data, width * height * 3, 1, file );
-    fclose( file );
-
-    glGenTextures( 1, &texture );
-    glBindTexture( GL_TEXTURE_2D, texture );
-    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE,
-GL_MODULATE ); //set texture environment parameters
-
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-GL_LINEAR );
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-GL_LINEAR );
-
-    //Here we are setting the parameter to repeat the texture instead of clamping the texture
-    //to the edge of our shape.
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-GL_REPEAT );
-    glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,
-GL_REPEAT );
-
-    //Generate the texture
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
-GL_RGB, GL_UNSIGNED_BYTE, data);
-    free( data ); //free the texture
-    return texture; //return whether it was successfull
-}
-
-// iterate over all tiles check the distance between x and y
-// if this distance is major than width or height the click was in an invalid area
-void getTileByPoints(int px, int py) {
-
-    int xx;
-    int yy;
-
-    int nearX = 0;
-    int nearY = 0;
-
-    int currentX;
-    int currentY;
-
-    float minDistance = 99999;
-
-    for (int i = 0; i < 10; i++) { // height of the map
-        for (int j = 0; j < 10; j++) { // width of the map
-
-            int x = j * tileWidth / 2;
-            int y = i * tileHeight;
-
-            xx = (x - y);
-            yy = ((x + y) / 2);
-
-            xx = xx + initialX;
-            yy = yy + initialY;
-
-            float distance = sqrt(pow((double) (px - xx), 2) + pow((double) (py - yy), 2));
-
-            if(distance < minDistance) {
-                minDistance = distance;
-
-                nearX = xx;
-                nearY = yy;
-            }
-
-        }
-    }
-
-    highlightX = nearX;
-    highlightY = nearY;
-}
-
 
 void keyboard(unsigned char key, int x, int y) {
     cout << x;
@@ -176,24 +99,51 @@ void keyboard(unsigned char key, int x, int y) {
 
 }
 
+void checkCollision() {
+    cout << "CHECK COLLISION" << endl;
+    cout << character->getTileX() << "==" << enemy->getTileX() << endl;
+    if (character->getTileX() == enemy->getTileX() && character->getTileY() == enemy->getTileY()) {
+        // GAME OVER
+        tileMap->highlightTile(character->getTileX(), character->getTileY());
+        gameStatus = 0;
+    }
+}
+
 void keyboardCommands(int key, int x, int y) {
+    // DIRECTIONS:
+    // - 0 = north
+    // - 1 = east
+    // - 3 = south
+    // - 4 = west
+
     switch(key) {
         case GLUT_KEY_UP:
-            character->move('N');
+            character->setDirection(0);
             break;
         case GLUT_KEY_DOWN:
-            character->move('S');
+            character->setDirection(3);
             break;
         case GLUT_KEY_LEFT:
-            character->move('W');
+            character->setDirection(4);
             break;
         case GLUT_KEY_RIGHT:
-            character->move('E');
+            character->setDirection(1);
             break;
     }
 
-    getTileByPoints(character->getX(), character->getY());
+    character->move();
+
+    checkCollision();
+
+    // getTileByPoints(character->getX(), character->getY());
+    // tileMap->updateTileTexture(nearX, nearY, textures[1]);
+
+    // tileMap->highlightNearest(character->getX(), character->getY());
     glutPostRedisplay();
+}
+
+void moveCharacter(Character *c, char direction) {
+    c->move();
 }
 
 void mouse(int button, int state, int x, int y) {
@@ -203,88 +153,77 @@ void mouse(int button, int state, int x, int y) {
         cout << y;
         cout << endl;
 
-        getTileByPoints(x,y);
+        // getTileByPoints(x,y);
+        // Tile t = tileMap->getNearest(x,y);
+
+        tileMap->highlightNearest(x, y);
+        // cout << "NEAREST: " << t.getX() << "x" << t.getY() << endl;
+        // tileMap->updateTileTexture(t.getX(), t.getY(), textures[1]);
+
         glutPostRedisplay();
     }
+}
 
+void renderGameOver() {
+    int x = 0;
+    int y = 10;
+    int width = 300;
+    int height = 50;
+
+    glBindTexture( GL_TEXTURE_2D, textures[6]);
+    glBegin(GL_POLYGON);
+        glTexCoord2d(0, 0);
+        glVertex3f (x + 0, y + 0, 0.0);
+        glTexCoord2d(1, 0);
+        glVertex3f (x + width, y + 0, 0.0);
+        glTexCoord2d(1, 1);
+        glVertex3f (x + width, y + height, 0.0);
+        glTexCoord2d(0, 1);
+        glVertex3f (x + 0, y + height, 0.0);
+    glEnd();
 }
 
 void display(void) {
-
-
     glClear (GL_COLOR_BUFFER_BIT);
 
-    glBindTexture( GL_TEXTURE_2D, texture2 );
-
-    for (int i = 0; i < 10; i++) { // height of the map
-        for (int j = 0; j < 10; j++) { // width of the map
-
-            int x = j * tileWidth / 2;
-            int y = i * tileHeight;
-
-            int xx = (x - y);
-            int yy = ((x + y) / 2);
-
-            xx = xx + initialX;
-            yy = yy + initialY;
-
-            if(xx == highlightX && yy == highlightY) {
-                glBindTexture( GL_TEXTURE_2D, texture4 );
-            } else {
-                glBindTexture( GL_TEXTURE_2D, texture2 );
-            }
-
-            // // DEBUG ANCHOR POINTS
-            // cout << "{ x: ";
-            // cout << xx;
-            // cout << ", y: ";
-            // cout << yy;
-            // cout << " },";
-            // cout << endl;
-
-            glBegin(GL_POLYGON);
-
-            // glTexCoord2d(0.0f, 0.0f);
-            glTexCoord2d(0, 0);
-            glVertex3f (xx, yy - tileHeight/2, 0.0);
-
-            // glTexCoord2d(0.0f, 1.0f);
-            glTexCoord2d(0, 1);
-            glVertex3f (xx - tileWidth/2, yy, 0.0);
-
-            // glTexCoord2d(1.0f, 1.0f);
-            glTexCoord2d(1, 1);
-            glVertex3f (xx, yy + tileHeight/2, 0.0);
-
-            // glTexCoord2d(1.0f, 0.0f);
-            glTexCoord2d(1, 0);
-            glVertex3f (xx + tileWidth/2, yy, 0.0);
-
-            glEnd();
-
-        }
+    if(gameStatus == 0) {
+        renderGameOver();
     }
 
-    glBindTexture( GL_TEXTURE_2D, texture );
-    character->render();
-    character2->render();
+    // renders the tile map
+    tileMap->render();
 
-    // glDrawPixels(image->getWidth(), image->getHeight(), GL_BGRA_EXT, GL_UNSIGNED_BYTE, image->getPixels());
+    enemy->render();
+    // if(character->getX() > tree->getX()
+    //     && character->getY() > tree->getY()
+    //     || character->getY() > tree->getY()) {
 
+    //     tree->render();
+    //     character->render();
+    // } else {
+        character->render();
+        // tree->render();
+    // }
+
+    // cout << character->getX() << "x" << character->getY() << " : " << enemy->getX() << "x" << enemy->getY() << endl;
     glFlush ();
 }
 
 
-void animateCharacter(int x) {
-    character2->move('W');
+void animateEnemy(int x) {
+    enemy->move();
+    checkCollision();
     glutPostRedisplay();
-    glutTimerFunc(200, animateCharacter, 1);
+
+    if(gameStatus == 1) {
+        glutTimerFunc(200, animateEnemy, 1);
+    }
+
 }
 
 
 void init (void)
 {
-    // glClearColor (0.0, 0.0, 0.0, 0.0);
     glClearColor( 1, 1, 1, 1);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -319,16 +258,58 @@ int main(int argc, char** argv)
     glutSpecialFunc(keyboardCommands);
     glutMouseFunc(mouse);
 
+    glGenTextures(10, textures);
 
-    texture2 = LoadTexture("images/texture2.raw", 256, 256);
-    texture3 = LoadTexture("images/texture3.raw", 256, 256);
-    // texture4 = loadImageTexture("texture.ptm");
-    texture4 = loadImageTexture("images/texture3.ptm");
-    texture = loadImageTexture("images/char.ptm");
+    loadTexture(textures[0], "images/floor.ptm");
+    loadTexture(textures[1], "images/texture3.ptm");
+    loadTexture(textures[2], "images/char.ptm");
+    loadTexture(textures[3], "images/enemy.ptm");
+    loadTexture(textures[4], "images/tree.ptm");
+    loadTexture(textures[5], "images/collision.ptm");
+    loadTexture(textures[6], "images/gameover.ptm");
+    loadTexture(textures[7], "images/truck.ptm");
+    // loadTexture(textures[8], "images/sphere.ptm");
+    // loadTexture(textures[9], "images/powerup.ptm");
 
-    character = new Character(initialX, initialY, 30, 60);
-    character2 = new Character(initialX + 50, initialY + 20, 30, 60);
-    animateCharacter(0);
+    // int map[100];
+    // for(int i = 0; i < 100; i++) {
+    //     if(i < 10){
+    //         map[i] = textures[1];
+    //     } else {
+    //         map[i] = textures[0];
+    //     }
+
+    // }
+
+    // map[2] = textures[1];
+    // // map[12] = textures[1];
+    // // map[44] = textures[1];
+
+    int map[100] = {textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1],
+        textures[1], textures[0], textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
+        textures[1], textures[0], textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
+        textures[1], textures[0], textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
+        textures[1], textures[0], textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
+        textures[1], textures[0], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1],
+        textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
+        textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
+        textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
+        textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1]};
+
+    tileMap = new TileMap(10, 10, tileWidth, tileHeight, initialX, initialY,
+                            textures[5], textures[1], map);
+
+
+    character = new Character(tileMap, initialX, initialY, 30, 60, textures[2]);
+    enemy = new Enemy(tileMap, initialX + 50, initialY + 20, 30, 60, textures[3]);
+    // enemy = new Enemy(tileMap, initialX + 50, initialY + 20, 100, 80, textures[7]);
+    // enemy = new Enemy(tileMap, initialX + 50, initialY + 20, 30, 30, textures[8]);
+    enemy->setDirection(3);
+
+    // tree = new Tree(initialX - 20, initialY - 20, 80, 110, textures[4]);
+    // powerUp = new PowerUp(tileMap, initialX - 20, initialY - 20, 80, 110, textures[9]);
+
+    // animateEnemy(0);
     glutMainLoop();
 
     return 0;   /* ISO C requires main to return int. */
