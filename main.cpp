@@ -33,6 +33,7 @@ Tree *tree;
 PowerUp *powerUp;
 
 std::vector<Enemy> trucks;
+std::vector<PowerUp> gameScore;
 
 TileMap *tileMap;
 
@@ -72,6 +73,10 @@ void loadTexture(GLuint texture, std::string filename){
           inf >> b;
 
           int rgb = (std::stoi(a) << 24) | (std::stoi(r) << 16) | (std::stoi(g) << 8) | std::stoi(b);
+          // int rgb = (std::stoi(r) << 24) | (std::stoi(g) << 16) | (std::stoi(b) << 8) | (std::stoi(a));
+
+
+
           // int rgb = (std::stoi(r) << 16) | (std::stoi(g) << 8) | std::stoi(b) | (std::stoi(a) << 24);
           // int rgb = (std::stoi(r) << 24) | (std::stoi(g) << 16) | std::stoi(b) << 8 | (std::stoi(a) << 24);
 
@@ -105,6 +110,24 @@ void keyboard(unsigned char key, int x, int y) {
 
 }
 
+void checkTruckCollision() {
+    // cout << "CHECK COLLISION" << endl;
+    // cout << character->getTileX() << "==" << enemy->getTileX() << endl;
+    for(int i = 0; i < trucks.size(); i++) {
+        Enemy *currentTruck = &trucks.at(i);
+
+        if (character->getTileX() == currentTruck->getTileX() && character->getTileY() == currentTruck->getTileY()) {
+
+                // GAME OVER
+                tileMap->highlightTile(character->getTileX(), character->getTileY());
+                gameStatus = 0;
+
+                break;
+        }
+    }
+
+}
+
 void checkEnemyCollision() {
     // cout << "CHECK COLLISION" << endl;
     // cout << character->getTileX() << "==" << enemy->getTileX() << endl;
@@ -134,6 +157,7 @@ void checkPowerUpCollision() {
         tileMap->highlightTile(character->getTileX(), character->getTileY());
 
         score++;
+        // gameScore.push_back
 
         int x = rand() % 670 + 130;
         int y = rand() % 670 + 130;
@@ -318,10 +342,11 @@ void animateEnemy(int x) {
 // }
 
 void animateTruck(int t) {
-    cout << "ANIMATE " << t << endl;
+    // cout << "ANIMATE " << t << endl;
     Enemy *currentTruck = &trucks.at(t);
     currentTruck->move();
     // checkEnemyCollision();
+    checkTruckCollision();
     if(currentTruck->getX() > 800 || currentTruck->getY() > 600) {
 
 
@@ -361,11 +386,13 @@ void init (void)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    glEnable( GL_TEXTURE_2D );
+
 
     // // transparency
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glEnable( GL_TEXTURE_2D );
 
     // glOrtho(-50.0, 50.0, -50.0, 50.0, -1.0, 1.0);
     glOrtho(0.0f, 800, 600, 0.0f, 0.0f, 1.0f);
@@ -438,29 +465,34 @@ int main(int argc, char** argv)
     // enemy = new Enemy(tileMap, 280, 210, 100, 80, textures[7]);
 
     // enemy = new Enemy(tileMap, 50, 0, 100, 80, textures[7]);
-    enemy = new Enemy(tileMap, initialX + 50, initialY + 20, 30, 30, textures[8]);
+    enemy = new Enemy(tileMap, 340, 240, 30, 30, textures[8]);
     enemy->setDirection(5);
 
-    truck = new Enemy(tileMap, 50, 0, 100, 80, textures[7]);
-    truck->setDirection(5);
+    // truck = new Enemy(tileMap, 50, 0, 100, 80, textures[7]);
+    truck = new Enemy(tileMap, 490, 285, 30, 30, textures[8]);
+    truck->setDirection(2);
 
-    truck2 = new Enemy(tileMap, 50, 50, 100, 80, textures[7]);
-    truck2->setDirection(5);
+    // truck2 = new Enemy(tileMap, 50, 50, 100, 80, textures[7]);
+    truck2 = new Enemy(tileMap, 520, 300, 30, 30, textures[8]);
+    truck2->setDirection(1);
 
-    Enemy *truck3 =  new Enemy(tileMap, 50, 100, 100, 80, textures[7]);
-    truck3->setDirection(5);
+    // Enemy *truck3 =  new Enemy(tileMap, 50, 100, 100, 80, textures[7]);
+    Enemy *truck3 = new Enemy(tileMap, 250, 285, 30, 30, textures[8]);
+    truck3->setDirection(4);
 
     trucks.push_back(*truck);
     trucks.push_back(*truck2);
     trucks.push_back(*truck3);
+    trucks.push_back(*enemy);
 
     // tree = new Tree(initialX - 20, initialY - 20, 80, 110, textures[4]);
     powerUp = new PowerUp(tileMap, initialX - 40, initialY + 20, 30, 30, textures[9]);
 
-    animateEnemy(0);
+    // animateEnemy(0);
     animateTruck(0);
     animateTruck(1);
     animateTruck(2);
+    animateTruck(3);
     glutMainLoop();
 
     return 0;   /* ISO C requires main to return int. */

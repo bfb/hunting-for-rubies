@@ -56,29 +56,15 @@ class Enemy {
       void move() {
 
         // find current tile
-        Tile tile = tileMap->getNearest(getX(), getY());
 
-        // // check if tiles is a boundary
-        // if(tileMap->getBoundaryTexture() == tile.getTexture()) {
-        //   // calculate direction
-        //   int nextDirection = rand() % 7;
-        //   while(direction == nextDirection) {
-        //     nextDirection = rand() % 7;
-        //   }
 
-        //   // if(direction == 0) {
 
-        //   //   direction =
-        //   // }
-
-        //   direction = nextDirection;
-        // }
 
 
 
 
         switch(direction) {
-          case 0:
+            case 0:
               y -= 10;
               break;
             case 1:
@@ -109,9 +95,54 @@ class Enemy {
         }
 
         // update current tile
-        tile = tileMap->getNearest(getX(), getY());
+        Tile tile = tileMap->getNearest(getX(), getY());
         tileY = tile.getY();
         tileX = tile.getX();
+
+
+// check if tiles is a boundary
+        if(tileMap->getBoundaryTexture() == tile.getTexture()) {
+          // // calculate direction
+          // int nextDirection = rand() % 7;
+          // while(direction == nextDirection) {
+          //   nextDirection = rand() % 7;
+          // }
+
+
+          // if(direction == 0) {
+
+          //   direction =
+          // }
+
+          switch(direction) {
+            case 0:
+                direction = 2;
+                break;
+            case 1:
+              direction = 3;
+              break;
+            case 2:
+              direction = 0;
+              break;
+            case 3:
+              direction = 1;
+              break;
+            case 4:
+              direction = 6;
+              break;
+            case 5:
+              direction = 7;
+              break;
+            case 6:
+              direction = 4;
+              break;
+            case 7:
+              direction = 5;
+              break;
+        }
+
+          // direction = nextDirection;
+        }
 
       }
 

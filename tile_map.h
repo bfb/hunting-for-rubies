@@ -167,14 +167,14 @@ class TileMap {
 
       int getBoundaryTexture() { return boundaryTexture; }
 
+      int getTileWidth(){ return tileWidth; }
+
+      int getTileHeight(){ return tileHeight; }
+
       std::vector<Tile> getMap() { return map; }
 
       Tile getTile(int x, int y) {
         return map[x*y];
-      }
-
-      void setTile(int x, int y) {
-
       }
 
     private:

@@ -17,11 +17,17 @@ class PowerUp {
 
       // current anchor x and y for colision
 
+      // // get a real X position
+      // int getX(){ return (width/2) + x; }
+
+      // // get a real Y position
+      // int getY(){ return height-5 + y; }
+
       // get a real X position
-      int getX(){ return (width/2) + x; }
+      int getX(){ return x - (width/2); }
 
       // get a real Y position
-      int getY(){ return height-5 + y; }
+      int getY(){ return y - height; }
 
       int getTexture() { return texture; }
 
@@ -34,13 +40,15 @@ class PowerUp {
       }
 
       void setTileX(int tx) {
+
         tileX = tx;
-        x = tx;
+        x = tx;//-tileMap->getTileWidth();
       }
 
       void setTileY(int ty) {
+
         tileY = ty;
-        y = ty;
+        y = ty;//-tileMap->getTileHeight();
       }
 
       void setDirection(int d) {
@@ -52,13 +60,13 @@ class PowerUp {
         glBindTexture( GL_TEXTURE_2D, texture);
           glBegin(GL_POLYGON);
               glTexCoord2d(0, 0);
-              glVertex3f (x + 0, y + 0, 0.0);
+              glVertex3f (getX() + 0, getY() + 0, 0.0);
               glTexCoord2d(1, 0);
-              glVertex3f (x + width, y + 0, 0.0);
+              glVertex3f (getX() + width, getY() + 0, 0.0);
               glTexCoord2d(1, 1);
-              glVertex3f (x + width, y + height, 0.0);
+              glVertex3f (getX() + width, getY() + height, 0.0);
               glTexCoord2d(0, 1);
-              glVertex3f (x + 0, y + height, 0.0);
+              glVertex3f (getX() + 0, getY() + height, 0.0);
           glEnd();
       }
 
