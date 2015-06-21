@@ -5,6 +5,7 @@ class Character {
         width = w; height = h;
         texture = t;
         tileMap = tp;
+        power = 0;
       }
 
       // current anchor x and y for colision
@@ -16,6 +17,12 @@ class Character {
       int getY(){ return height-5 + y; }
 
       int getTexture() { return texture; }
+
+      int getPower() { return power; }
+
+      void setPower(int p) {
+        power = p;
+      }
 
       int getTileX() {
         return tileX;
@@ -58,32 +65,56 @@ class Character {
       //   tileX = t.getX();
       // }
 
-      // DIRECTIONS:
-      // - 0 = north
-      // - 1 = east
-      // - 3 = south
-      // - 4 = west
+      /* DIRECTIONS:
+          - 0 = north
+          - 1 = east
+          - 2 = south
+          - 3 = west
+          - 4 = ne
+          - 5 = se
+          - 6 = sw
+          - 7 = nw
+      */
       void move() {
-        switch(direction) {
-          case 0:
-            y -= 10;
-            break;
-          case 3:
-            y += 10;
-            break;
-          case 1:
-            x -= 10;
-            break;
-          case 4:
-            x += 10;
-            break;
-        }
+        // Tile tile = tileMap->getNearest(getX(), getY());
+        // if(tileMap->getBoundaryTexture() != tile.getTexture()) {
+          switch(direction) {
+            case 0:
+              y -= 10;
+              break;
+            case 1:
+              x += 10;
+              break;
+            case 2:
+              y+= 10;
+              break;
+            case 3:
+              x -= 10;
+              break;
+            case 4:
+              x += 10;
+              y -= 5;
+              break;
+            case 5:
+              x += 10;
+              y += 5;
+              break;
+            case 6:
+              x -= 10;
+              y += 5;
+              break;
+            case 7:
+              x -= 10;
+              y -= 5;
+              break;
+          }
 
 
-        // find current tile
-        Tile tile = tileMap->getNearest(getX(), getY());
-        tileY = tile.getY();
-        tileX = tile.getX();
+          // find current tile
+          Tile tile = tileMap->getNearest(getX(), getY());
+          tileY = tile.getY();
+          tileX = tile.getX();
+        // }pop
 
       }
 
@@ -103,7 +134,7 @@ class Character {
       }
 
     private:
-      int x, y, width, height, texture, tileX, tileY, direction;
+      int x, y, width, height, texture, tileX, tileY, direction, power;
       TileMap *tileMap;
 
 };

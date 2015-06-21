@@ -31,60 +31,88 @@ class Enemy {
 
       void setTileX(int tx) {
         tileX = tx;
+        x = tx;
       }
 
       void setTileY(int ty) {
         tileY = ty;
+        y = ty;
       }
 
       void setDirection(int d) {
         direction = d;
       }
 
-      // DIRECTIONS:
-      // - 0 = north
-      // - 1 = east
-      // - 3 = south
-      // - 4 = west
+      /* DIRECTIONS:
+          - 0 = north
+          - 1 = east
+          - 2 = south
+          - 3 = west
+          - 4 = ne
+          - 5 = se
+          - 6 = sw
+          - 7 = nw
+      */
       void move() {
-        switch(direction) {
-          case 0:
-            y -= 10;
-            break;
-          case 3:
-            y += 10;
-            break;
-          case 1:
-            x -= 10;
-            break;
-          case 4:
-            x += 10;
-            break;
-        }
 
         // find current tile
         Tile tile = tileMap->getNearest(getX(), getY());
+
+        // // check if tiles is a boundary
+        // if(tileMap->getBoundaryTexture() == tile.getTexture()) {
+        //   // calculate direction
+        //   int nextDirection = rand() % 7;
+        //   while(direction == nextDirection) {
+        //     nextDirection = rand() % 7;
+        //   }
+
+        //   // if(direction == 0) {
+
+        //   //   direction =
+        //   // }
+
+        //   direction = nextDirection;
+        // }
+
+
+
+
+        switch(direction) {
+          case 0:
+              y -= 10;
+              break;
+            case 1:
+              x += 10;
+              break;
+            case 2:
+              y+= 10;
+              break;
+            case 3:
+              x -= 10;
+              break;
+            case 4:
+              x += 10;
+              y -= 5;
+              break;
+            case 5:
+              x += 10;
+              y += 5;
+              break;
+            case 6:
+              x -= 10;
+              y += 5;
+              break;
+            case 7:
+              x -= 10;
+              y -= 5;
+              break;
+        }
+
+        // update current tile
+        tile = tileMap->getNearest(getX(), getY());
         tileY = tile.getY();
         tileX = tile.getX();
 
-        if(tileMap->getBoundaryTexture() == tile.getTexture()) {
-          // calculate direction
-          switch(direction) {
-            case 0:
-              direction = 3;
-              break;
-            case 1:
-              direction = 4;
-              break;
-            case 3:
-              direction = 0;
-              break;
-            case 4:
-              direction = 1;
-              break;
-          }
-
-        }
       }
 
       void render() {

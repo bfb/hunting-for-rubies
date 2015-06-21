@@ -6,7 +6,7 @@ GLuint texture;
 GLuint texture2;
 GLuint texture3;
 GLuint texture4;
-GLuint textures[10];
+GLuint textures[20];
 
 Image *image;
 
@@ -21,12 +21,18 @@ int highlightY = 0;
 
 // game status
 int gameStatus = 1;
+int score = 0;
 
 // game components
 Character *character;
 Enemy *enemy;
+Enemy *truck;
+Enemy *truck2;
+
 Tree *tree;
-// PowerUp *powerUp;
+PowerUp *powerUp;
+
+std::vector<Enemy> trucks;
 
 TileMap *tileMap;
 
@@ -99,41 +105,89 @@ void keyboard(unsigned char key, int x, int y) {
 
 }
 
-void checkCollision() {
-    cout << "CHECK COLLISION" << endl;
-    cout << character->getTileX() << "==" << enemy->getTileX() << endl;
+void checkEnemyCollision() {
+    // cout << "CHECK COLLISION" << endl;
+    // cout << character->getTileX() << "==" << enemy->getTileX() << endl;
     if (character->getTileX() == enemy->getTileX() && character->getTileY() == enemy->getTileY()) {
+        if(character->getPower() == 1) {
+            tileMap->highlightTile(character->getTileX(), character->getTileY());
+            score++;
+
+            // move the ball to initial position
+            // set direction and speed based in a random value
+            enemy->setTileX(400);
+            enemy->setTileY(270);
+        } else {
+            // GAME OVER
+            tileMap->highlightTile(character->getTileX(), character->getTileY());
+            gameStatus = 0;
+        }
+
+    }
+}
+
+void checkPowerUpCollision() {
+    // cout << "CHECK COLLISION" << endl;
+    // cout << character->getTileX() << "==" << powerUp->getTileX() << endl;
+    if (character->getTileX() == powerUp->getTileX() && character->getTileY() == powerUp->getTileY()) {
         // GAME OVER
         tileMap->highlightTile(character->getTileX(), character->getTileY());
-        gameStatus = 0;
+
+        score++;
+
+        int x = rand() % 670 + 130;
+        int y = rand() % 670 + 130;
+
+        Tile tile = tileMap->getNearest(x, y);
+        powerUp->setTileX(tile.getX());
+        powerUp->setTileY(tile.getY());
+        glutPostRedisplay();
     }
+}
+
+void nextPowerUp() {
+    int x = rand() % 670 + 130;
+    int y = rand() % 670 + 130;
 }
 
 void keyboardCommands(int key, int x, int y) {
     // DIRECTIONS:
     // - 0 = north
     // - 1 = east
-    // - 3 = south
-    // - 4 = west
+    // - 2 = south
+    // - 3 = west
 
     switch(key) {
         case GLUT_KEY_UP:
             character->setDirection(0);
             break;
         case GLUT_KEY_DOWN:
-            character->setDirection(3);
+            character->setDirection(2);
             break;
         case GLUT_KEY_LEFT:
-            character->setDirection(4);
+            character->setDirection(3);
             break;
         case GLUT_KEY_RIGHT:
             character->setDirection(1);
+            break;
+        case 'i':
+            character->setDirection(4);
+            break;
+        case 'l':
+            character->setDirection(5);
+            break;
+        case 'k':
+            character->setDirection(6);
+            break;
+        case 'j':
+            character->setDirection(7);
             break;
     }
 
     character->move();
 
-    checkCollision();
+    checkEnemyCollision();
+    checkPowerUpCollision();
 
     // getTileByPoints(character->getX(), character->getY());
     // tileMap->updateTileTexture(nearX, nearY, textures[1]);
@@ -194,6 +248,10 @@ void display(void) {
     tileMap->render();
 
     enemy->render();
+
+    for(int i = 0; i < trucks.size(); i++) {
+        trucks.at(i).render();
+    }
     // if(character->getX() > tree->getX()
     //     && character->getY() > tree->getY()
     //     || character->getY() > tree->getY()) {
@@ -205,6 +263,8 @@ void display(void) {
         // tree->render();
     // }
 
+        powerUp->render();
+
     // cout << character->getX() << "x" << character->getY() << " : " << enemy->getX() << "x" << enemy->getY() << endl;
     glFlush ();
 }
@@ -212,11 +272,84 @@ void display(void) {
 
 void animateEnemy(int x) {
     enemy->move();
-    checkCollision();
+    checkEnemyCollision();
     glutPostRedisplay();
 
     if(gameStatus == 1) {
-        glutTimerFunc(200, animateEnemy, 1);
+        glutTimerFunc(50, animateEnemy, 1);
+    }
+
+}
+
+// void animateTruck(int t) {
+//     Enemy truck = trucks.at(t);
+//     truck->move();
+//     // checkEnemyCollision();
+//     if(truck->getX() > 800 || truck->getY() > 600) {
+
+
+//         int truckOrigin = rand() % 3;
+
+//         switch(truckOrigin){
+//             case 0:
+//                 truck->setTileX(0);
+//                 truck->setTileY(0);
+//                 break;
+//             case 1:
+//                 truck->setTileX(0);
+//                 truck->setTileY(20);
+//                 break;
+//             case 2:
+//                 truck->setTileX(0);
+//                 truck->setTileY(100);
+//                 break;
+//             case 3:
+//                 truck->setTileX(0);
+//                 truck->setTileY(60);
+//                 break;
+//         }
+//     }
+//     glutPostRedisplay();
+
+//     if(gameStatus == 1) {
+//         glutTimerFunc(50, animateTruck, t);
+//     }
+
+// }
+
+void animateTruck(int t) {
+    cout << "ANIMATE " << t << endl;
+    Enemy *currentTruck = &trucks.at(t);
+    currentTruck->move();
+    // checkEnemyCollision();
+    if(currentTruck->getX() > 800 || currentTruck->getY() > 600) {
+
+
+        int truckOrigin = rand() % 3;
+
+        switch(truckOrigin){
+            case 0:
+                currentTruck->setTileX(10 * t);
+                currentTruck->setTileY(10 * t);
+                break;
+            case 1:
+                currentTruck->setTileX(0 * t);
+                currentTruck->setTileY(50 * t);
+                break;
+            case 2:
+                currentTruck->setTileX(40 * t);
+                currentTruck->setTileY(100 * t);
+                break;
+            case 3:
+                currentTruck->setTileX(20 * t);
+                currentTruck->setTileY(60 * t);
+                break;
+        }
+    }
+    glutPostRedisplay();
+
+    if(gameStatus == 1) {
+        glutTimerFunc(50, animateTruck, t);
     }
 
 }
@@ -258,7 +391,7 @@ int main(int argc, char** argv)
     glutSpecialFunc(keyboardCommands);
     glutMouseFunc(mouse);
 
-    glGenTextures(10, textures);
+    glGenTextures(20, textures);
 
     loadTexture(textures[0], "images/floor.ptm");
     loadTexture(textures[1], "images/texture3.ptm");
@@ -268,8 +401,8 @@ int main(int argc, char** argv)
     loadTexture(textures[5], "images/collision.ptm");
     loadTexture(textures[6], "images/gameover.ptm");
     loadTexture(textures[7], "images/truck.ptm");
-    // loadTexture(textures[8], "images/sphere.ptm");
-    // loadTexture(textures[9], "images/powerup.ptm");
+    loadTexture(textures[8], "images/sphere.ptm");
+    loadTexture(textures[9], "images/powerup.ptm");
 
     // int map[100];
     // for(int i = 0; i < 100; i++) {
@@ -286,11 +419,11 @@ int main(int argc, char** argv)
     // // map[44] = textures[1];
 
     int map[100] = {textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1],
-        textures[1], textures[0], textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
-        textures[1], textures[0], textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
-        textures[1], textures[0], textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
-        textures[1], textures[0], textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
-        textures[1], textures[0], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1],
+        textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
+        textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
+        textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
+        textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
+        textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
         textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
         textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
         textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
@@ -301,15 +434,33 @@ int main(int argc, char** argv)
 
 
     character = new Character(tileMap, initialX, initialY, 30, 60, textures[2]);
-    enemy = new Enemy(tileMap, initialX + 50, initialY + 20, 30, 60, textures[3]);
-    // enemy = new Enemy(tileMap, initialX + 50, initialY + 20, 100, 80, textures[7]);
-    // enemy = new Enemy(tileMap, initialX + 50, initialY + 20, 30, 30, textures[8]);
-    enemy->setDirection(3);
+    // enemy = new Enemy(tileMap, initialX + 50, initialY + 20, 30, 60, textures[3]);
+    // enemy = new Enemy(tileMap, 280, 210, 100, 80, textures[7]);
+
+    // enemy = new Enemy(tileMap, 50, 0, 100, 80, textures[7]);
+    enemy = new Enemy(tileMap, initialX + 50, initialY + 20, 30, 30, textures[8]);
+    enemy->setDirection(5);
+
+    truck = new Enemy(tileMap, 50, 0, 100, 80, textures[7]);
+    truck->setDirection(5);
+
+    truck2 = new Enemy(tileMap, 50, 50, 100, 80, textures[7]);
+    truck2->setDirection(5);
+
+    Enemy *truck3 =  new Enemy(tileMap, 50, 100, 100, 80, textures[7]);
+    truck3->setDirection(5);
+
+    trucks.push_back(*truck);
+    trucks.push_back(*truck2);
+    trucks.push_back(*truck3);
 
     // tree = new Tree(initialX - 20, initialY - 20, 80, 110, textures[4]);
-    // powerUp = new PowerUp(tileMap, initialX - 20, initialY - 20, 80, 110, textures[9]);
+    powerUp = new PowerUp(tileMap, initialX - 40, initialY + 20, 30, 30, textures[9]);
 
-    // animateEnemy(0);
+    animateEnemy(0);
+    animateTruck(0);
+    animateTruck(1);
+    animateTruck(2);
     glutMainLoop();
 
     return 0;   /* ISO C requires main to return int. */

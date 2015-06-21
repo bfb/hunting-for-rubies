@@ -6,9 +6,14 @@ class PowerUp {
         texture = t;
         tileMap = tp;
 
-
+        calculateTile();
       }
 
+      void calculateTile() {
+        Tile tile = tileMap->getNearest(getX(), getY());
+        tileY = tile.getY();
+        tileX = tile.getX();
+      }
 
       // current anchor x and y for colision
 
@@ -30,10 +35,12 @@ class PowerUp {
 
       void setTileX(int tx) {
         tileX = tx;
+        x = tx;
       }
 
       void setTileY(int ty) {
         tileY = ty;
+        y = ty;
       }
 
       void setDirection(int d) {
