@@ -32,6 +32,27 @@ std::vector<Ruby> gameScore;
 
 TileMap *tileMap;
 
+std::vector<int> mapFile;
+
+void loadMapFile(std::string filename) {
+    ifstream inf(filename);
+
+    // If we couldn't open the output file stream for reading
+    if (!inf) {
+      // Print an error and exit
+      cerr << "File error: " + filename << endl;
+      exit(1);
+    }
+
+    std::string tile;
+
+    // for(int t = 0; t < cols*rows; t++) {
+    while(inf){
+        inf >> tile;
+        mapFile.push_back(std::stoi(tile));
+    }
+}
+
 void loadTexture(GLuint texture, std::string filename){
     ifstream inf(filename);
 
@@ -302,26 +323,11 @@ void loadAllTextures() {
 }
 
 void createMap() {
-int map[100] = {textures[1], textures[1], textures[1], textures[1], textures[19], textures[1], textures[1], textures[1], textures[1], textures[1],
-                    textures[1], textures[0], textures[21], textures[0], textures[19], textures[0], textures[0], textures[0], textures[0], textures[1],
-                    textures[18], textures[18], textures[18], textures[18], textures[2], textures[18], textures[18], textures[18], textures[18], textures[18],
-                    textures[1], textures[0], textures[0], textures[0], textures[19], textures[0], textures[0], textures[0], textures[0], textures[1],
-                    textures[1], textures[0], textures[0], textures[0], textures[19], textures[0], textures[0], textures[7], textures[0], textures[1],
-                    textures[1], textures[20], textures[0], textures[0], textures[19], textures[0], textures[0], textures[0], textures[0], textures[1],
-                    textures[1], textures[0], textures[0], textures[0], textures[19], textures[0], textures[0], textures[0], textures[0], textures[1],
-                    textures[1], textures[7], textures[0], textures[0], textures[19], textures[0], textures[21], textures[0], textures[0], textures[1],
-                    textures[1], textures[0], textures[0], textures[20], textures[19], textures[0], textures[0], textures[0], textures[0], textures[1],
-                    textures[1], textures[1], textures[1], textures[1], textures[19], textures[1], textures[1], textures[1], textures[1], textures[1]};
-    // int map[100] = {textures[1], textures[1], textures[1], textures[1], textures[18], textures[1], textures[1], textures[1], textures[1], textures[1],
-    //                 textures[1], textures[0], textures[21], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
-    //                 textures[19], textures[19], textures[19], textures[19], textures[2], textures[19], textures[19], textures[19], textures[19], textures[19],
-    //                 textures[1], textures[0], textures[0], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
-    //                 textures[1], textures[0], textures[0], textures[0], textures[18], textures[0], textures[0], textures[7], textures[0], textures[1],
-    //                 textures[1], textures[20], textures[0], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
-    //                 textures[1], textures[0], textures[0], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
-    //                 textures[1], textures[7], textures[0], textures[0], textures[18], textures[0], textures[21], textures[0], textures[0], textures[1],
-    //                 textures[1], textures[0], textures[0], textures[20], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
-    //                 textures[1], textures[1], textures[1], textures[1], textures[18], textures[1], textures[1], textures[1], textures[1], textures[1]};
+    int map[cols*rows];
+
+    for(int i = 0; i < mapFile.size(); i++) {
+        map[i] = textures[mapFile[i]];
+    }
 
     tileMap = new TileMap(cols, rows, tileWidth, tileHeight, initialX, initialY,
                             textures[5], textures[1], map);
@@ -428,8 +434,13 @@ int main(int argc, char** argv)
     glutSpecialFunc(keyboardCommands);
     glutMouseFunc(mouse);
 
+
+
     loadAllTextures();
+    loadMapFile("map.txt");
     loadGame();
+
+
 
 
     // enemy = new Enemy(tileMap, initialX + 50, initialY + 20, 30, 60, textures[3]);
