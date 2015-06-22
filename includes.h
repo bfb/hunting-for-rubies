@@ -11,7 +11,7 @@
 #include "tile_map.h"
 #include "character.h"
 #include "enemy.h"
-#include "power_up.h"
+#include "ruby.h"
 #include "tree.h"
 
 // #include "imageable.h"

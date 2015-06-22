@@ -2,35 +2,33 @@
 
 using namespace std;
 
-GLuint texture;
-GLuint texture2;
-GLuint texture3;
-GLuint texture4;
-GLuint textures[20];
+GLuint textures[40];
 
-Image *image;
-
+// initial position to start the map
 int initialX = 400;
 int initialY = 150;
 
+int cols = 10;
+int rows = 10;
+
+// tile size
 int tileWidth = 60;
 int tileHeight = 30;
 
-int highlightX = 0;
-int highlightY = 0;
+int scoreX = 40;
+int scoreY = 580;
 
 // game status
 int gameStatus = 1;
-int score = 0;
 
 // game components
 Character *character;
 
 Tree *tree;
-PowerUp *powerUp;
+Ruby *ruby;
 
 std::vector<Enemy> enemies;
-std::vector<PowerUp> gameScore;
+std::vector<Ruby> gameScore;
 
 TileMap *tileMap;
 
@@ -59,8 +57,8 @@ void loadTexture(GLuint texture, std::string filename){
     std::string b;
     std::string a;
 
-    // Image *image = new Image(std::stoi(width), std::stoi(height));
-    image = new Image(std::stoi(width), std::stoi(height));
+    Image *image = new Image(std::stoi(width), std::stoi(height));
+    // image = new Image(std::stoi(width), std::stoi(height));
 
     for(int y = 0; y < image->getHeight(); y++) {
         for(int x = 0; x < image->getWidth(); x++) {
@@ -81,7 +79,6 @@ void loadTexture(GLuint texture, std::string filename){
         }
     }
 
-    // glGenTextures( texture, textures );
     glBindTexture( GL_TEXTURE_2D, texture );
 
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -96,88 +93,36 @@ void loadTexture(GLuint texture, std::string filename){
     free(image);
 }
 
-void keyboard(unsigned char key, int x, int y) {
-    cout << x;
-    cout << " x ";
-    cout << y;
-    cout << endl;
-
-    // character->move();
-
-
-}
-
 void checkEnemyCollision() {
-    // cout << "CHECK COLLISION" << endl;
-    // cout << character->getTileX() << "==" << enemy->getTileX() << endl;
     for(int i = 0; i < enemies.size(); i++) {
         Enemy *current = &enemies.at(i);
 
         if (character->getTileX() == current->getTileX() && character->getTileY() == current->getTileY()) {
+            // GAME OVER
+            tileMap->highlightTile(character->getTileX(), character->getTileY());
+            gameStatus = 0;
 
-                // GAME OVER
-                tileMap->highlightTile(character->getTileX(), character->getTileY());
-                gameStatus = 0;
-
-                break;
+            break;
         }
     }
-
 }
 
-// void checkEnemyCollision() {
-//     // cout << "CHECK COLLISION" << endl;
-//     // cout << character->getTileX() << "==" << enemy->getTileX() << endl;
-//     if (character->getTileX() == enemy->getTileX() && character->getTileY() == enemy->getTileY()) {
-//         if(character->getPower() == 1) {
-//             tileMap->highlightTile(character->getTileX(), character->getTileY());
-//             score++;
+void checkRubyCollision() {
+    if (character->getTileX() == ruby->getTileX() && character->getTileY() == ruby->getTileY()) {
+        // INCREASE SCORE
+        // tileMap->highlightTile(character->getTileX(), character->getTileY());
 
-//             // move the ball to initial position
-//             // set direction and speed based in a random value
-//             enemy->setTileX(400);
-//             enemy->setTileY(270);
-//         } else {
-//             // GAME OVER
-//             tileMap->highlightTile(character->getTileX(), character->getTileY());
-//             gameStatus = 0;
-//         }
+        Ruby *r = new Ruby((gameScore.size() + 1) * (scoreX), scoreY, 30, 30, textures[9]);
+        gameScore.push_back(*r);
 
-//     }
-// }
+        // get another position
+        ruby->randomPosition();
 
-void checkPowerUpCollision() {
-    // cout << "CHECK COLLISION" << endl;
-    // cout << character->getTileX() << "==" << powerUp->getTileX() << endl;
-    if (character->getTileX() == powerUp->getTileX() && character->getTileY() == powerUp->getTileY()) {
-        // GAME OVER
-        tileMap->highlightTile(character->getTileX(), character->getTileY());
-
-        score++;
-        // gameScore.push_back
-
-        int x = rand() % 670 + 130;
-        int y = rand() % 670 + 130;
-
-        Tile tile = tileMap->getNearest(x, y);
-        powerUp->setTileX(tile.getX());
-        powerUp->setTileY(tile.getY());
         glutPostRedisplay();
     }
 }
 
-void nextPowerUp() {
-    int x = rand() % 670 + 130;
-    int y = rand() % 670 + 130;
-}
-
 void keyboardCommands(int key, int x, int y) {
-    // DIRECTIONS:
-    // - 0 = north
-    // - 1 = east
-    // - 2 = south
-    // - 3 = west
-
     switch(key) {
         case GLUT_KEY_UP:
             character->setDirection(0);
@@ -208,17 +153,9 @@ void keyboardCommands(int key, int x, int y) {
     character->move();
 
     checkEnemyCollision();
-    checkPowerUpCollision();
+    checkRubyCollision();
 
-    // getTileByPoints(character->getX(), character->getY());
-    // tileMap->updateTileTexture(nearX, nearY, textures[1]);
-
-    // tileMap->highlightNearest(character->getX(), character->getY());
     glutPostRedisplay();
-}
-
-void moveCharacter(Character *c, char direction) {
-    c->move();
 }
 
 void mouse(int button, int state, int x, int y) {
@@ -228,12 +165,7 @@ void mouse(int button, int state, int x, int y) {
         cout << y;
         cout << endl;
 
-        // getTileByPoints(x,y);
-        // Tile t = tileMap->getNearest(x,y);
-
         tileMap->highlightNearest(x, y);
-        // cout << "NEAREST: " << t.getX() << "x" << t.getY() << endl;
-        // tileMap->updateTileTexture(t.getX(), t.getY(), textures[1]);
 
         glutPostRedisplay();
     }
@@ -265,150 +197,194 @@ void display(void) {
         renderGameOver();
     }
 
+    // render score
+    for(int i = 0; i < gameScore.size(); i++) {
+        gameScore.at(i).render();
+    }
+
     // renders the tile map
     tileMap->render();
 
-    // enemy->render();
-
     for(int i = 0; i < enemies.size(); i++) {
-        enemies.at(i).render();
+        Enemy *current = &enemies.at(i);
+        if(character->getX() + 20 > current->getX() ||
+           character->getY() > current->getY()){
+            current->render();
+        }
     }
-    // if(character->getX() > tree->getX()
-    //     && character->getY() > tree->getY()
-    //     || character->getY() > tree->getY()) {
 
+
+
+    ruby->render();
+
+    // if(character->getX() + 20 < tree->getX() ||
+    //        character->getY() < tree->getY()){
+    //     character->render();
+    //     tree->render();
+    // } else {
     //     tree->render();
     //     character->render();
-    // } else {
-        character->render();
-        // tree->render();
     // }
 
-        powerUp->render();
+    character->render();
 
-    // cout << character->getX() << "x" << character->getY() << " : " << enemy->getX() << "x" << enemy->getY() << endl;
+    for(int i = 0; i < enemies.size(); i++) {
+        Enemy *current = &enemies.at(i);
+        if(character->getX() + 20 < current->getX() ||
+           character->getY() < current->getY()){
+            current->render();
+        }
+    }
+
+    // for(int i = 0; i < enemies.size(); i++) {
+    //     enemies.at(i).render();
+    // }
+
+    tree->render();
+
+
     glFlush ();
 }
 
-
-// void animateEnemy(int x) {
-//     enemy->move();
-//     checkEnemyCollision();
-//     glutPostRedisplay();
-
-//     if(gameStatus == 1) {
-//         glutTimerFunc(50, animateEnemy, 1);
-//     }
-
-// }
-
-// void animateTruck(int t) {
-//     Enemy truck = trucks.at(t);
-//     truck->move();
-//     // checkEnemyCollision();
-//     if(truck->getX() > 800 || truck->getY() > 600) {
-
-
-//         int truckOrigin = rand() % 3;
-
-//         switch(truckOrigin){
-//             case 0:
-//                 truck->setTileX(0);
-//                 truck->setTileY(0);
-//                 break;
-//             case 1:
-//                 truck->setTileX(0);
-//                 truck->setTileY(20);
-//                 break;
-//             case 2:
-//                 truck->setTileX(0);
-//                 truck->setTileY(100);
-//                 break;
-//             case 3:
-//                 truck->setTileX(0);
-//                 truck->setTileY(60);
-//                 break;
-//         }
-//     }
-//     glutPostRedisplay();
-
-//     if(gameStatus == 1) {
-//         glutTimerFunc(50, animateTruck, t);
-//     }
-
-// }
-
 void animateEnemy(int e) {
-    // cout << "ANIMATE " << t << endl;
     Enemy *current = &enemies.at(e);
     current->move();
-    // checkEnemyCollision();
     checkEnemyCollision();
-    // if(current->getX() > 800 || current->getY() > 600) {
 
-
-    //     int truckOrigin = rand() % 3;
-
-    //     switch(truckOrigin){
-    //         case 0:
-    //             current->setTileX(10 * t);
-    //             current->setTileY(10 * t);
-    //             break;
-    //         case 1:
-    //             current->setTileX(0 * t);
-    //             current->setTileY(50 * t);
-    //             break;
-    //         case 2:
-    //             current->setTileX(40 * t);
-    //             current->setTileY(100 * t);
-    //             break;
-    //         case 3:
-    //             current->setTileX(20 * t);
-    //             currentTruck->setTileY(60 * t);
-    //             break;
-    //     }
-    // }
     glutPostRedisplay();
 
     if(gameStatus == 1) {
         glutTimerFunc(50, animateEnemy, e);
     }
-
 }
-
 
 void init (void)
 {
     glClearColor( 1, 1, 1, 1);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-
-
-
-    // // transparency
+    // transparency
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glEnable( GL_TEXTURE_2D );
 
-    // glOrtho(-50.0, 50.0, -50.0, 50.0, -1.0, 1.0);
     glOrtho(0.0f, 800, 600, 0.0f, 0.0f, 1.0f);
 }
 
+void loadAllTextures() {
+    glGenTextures(40, textures);
+
+    loadTexture(textures[0], "images/grass.ptm");
+    loadTexture(textures[1], "images/grass.ptm");
+    loadTexture(textures[2], "images/sidewalk_central.ptm");
+    loadTexture(textures[3], "images/enemy.ptm");
+    loadTexture(textures[4], "images/tree.ptm");
+    loadTexture(textures[5], "images/selected.ptm");
+    loadTexture(textures[6], "images/gameover.ptm");
+    loadTexture(textures[7], "images/grass_with_water.ptm");
+    loadTexture(textures[8], "images/sphere.ptm");
+    loadTexture(textures[9], "images/ruby.ptm");
+    loadTexture(textures[18], "images/sidewalk.ptm");
+    loadTexture(textures[19], "images/sidewalk2.ptm");
+    loadTexture(textures[20], "images/grass_with_flower.ptm");
+    loadTexture(textures[21], "images/grass_with_flower2.ptm");
+
+    // character textures
+    loadTexture(textures[10], "images/charN.ptm");
+    loadTexture(textures[11], "images/charE.ptm");
+    loadTexture(textures[12], "images/charS.ptm");
+    loadTexture(textures[13], "images/charW.ptm");
+    loadTexture(textures[14], "images/charNE.ptm");
+    loadTexture(textures[15], "images/charSE.ptm");
+    loadTexture(textures[16], "images/charSW.ptm");
+    loadTexture(textures[17], "images/charNW.ptm");
+}
+
+void createMap() {
+
+    int map[100] = {textures[1], textures[1], textures[1], textures[1], textures[18], textures[1], textures[1], textures[1], textures[1], textures[1],
+                    textures[1], textures[0], textures[21], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
+                    textures[19], textures[19], textures[19], textures[19], textures[2], textures[19], textures[19], textures[19], textures[19], textures[19],
+                    textures[1], textures[0], textures[0], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
+                    textures[1], textures[0], textures[0], textures[0], textures[18], textures[0], textures[0], textures[7], textures[0], textures[1],
+                    textures[1], textures[20], textures[0], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
+                    textures[1], textures[0], textures[0], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
+                    textures[1], textures[7], textures[0], textures[0], textures[18], textures[0], textures[21], textures[0], textures[0], textures[1],
+                    textures[1], textures[0], textures[0], textures[20], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
+                    textures[1], textures[1], textures[1], textures[1], textures[18], textures[1], textures[1], textures[1], textures[1], textures[1]};
+
+    tileMap = new TileMap(cols, rows, tileWidth, tileHeight, initialX, initialY,
+                            textures[5], textures[1], map);
+
+    tree = new Tree(240, 270, 80, 110, textures[4]);
+}
+
+void createCharacter() {
+    // char textures vector
+    std::vector<int> ct;
+    ct.push_back(textures[10]);
+    ct.push_back(textures[11]);
+    ct.push_back(textures[12]);
+    ct.push_back(textures[13]);
+    ct.push_back(textures[14]);
+    ct.push_back(textures[15]);
+    ct.push_back(textures[16]);
+    ct.push_back(textures[17]);
+    ct.push_back(textures[18]);
+
+    character = new Character(tileMap, initialX, initialY, 30, 60, ct);
+}
+
+void createRuby() {
+    std::vector<Tile> possibleTiles;
+
+    // possible tiles to drop the ruby
+    Tile *t;
+
+    t = new Tile(550, 285);
+    possibleTiles.push_back(*t);
+
+    t = new Tile(490, 345);
+    possibleTiles.push_back(*t);
+
+    t = new Tile(400, 300);
+    possibleTiles.push_back(*t);
+
+    t = new Tile(310, 285);
+    possibleTiles.push_back(*t);
+
+    t = new Tile(190, 285);
+    possibleTiles.push_back(*t);
+
+    t = new Tile(370, 225);
+    possibleTiles.push_back(*t);
+
+    t = new Tile(520, 240);
+    possibleTiles.push_back(*t);
+
+    t = new Tile(400, 180);
+    possibleTiles.push_back(*t);
+
+    t = new Tile(370, 375);
+    possibleTiles.push_back(*t);
+
+    t = new Tile(310, 225);
+    possibleTiles.push_back(*t);
+
+    ruby = new Ruby(tileMap, 30, 30, textures[9], possibleTiles);
+}
+
 void createEnemies() {
-        // enemy = new Enemy(tileMap, 50, 0, 100, 80, textures[7]);
     Enemy *enemy = new Enemy(tileMap, 340, 240, 30, 30, textures[8]);
     enemy->setDirection(5);
 
-    // truck = new Enemy(tileMap, 50, 0, 100, 80, textures[7]);
     Enemy *enemy2 = new Enemy(tileMap, 490, 285, 30, 30, textures[8]);
     enemy2->setDirection(2);
 
-    // truck2 = new Enemy(tileMap, 50, 50, 100, 80, textures[7]);
     Enemy *enemy3 = new Enemy(tileMap, 520, 300, 30, 30, textures[8]);
     enemy3->setDirection(1);
 
-    // Enemy *truck3 =  new Enemy(tileMap, 50, 100, 100, 80, textures[7]);
     Enemy *enemy4 = new Enemy(tileMap, 250, 285, 30, 30, textures[8]);
     enemy4->setDirection(4);
 
@@ -417,94 +393,40 @@ void createEnemies() {
     enemies.push_back(*enemy3);
     enemies.push_back(*enemy4);
 
-    // tree = new Tree(initialX - 20, initialY - 20, 80, 110, textures[4]);
-    powerUp = new PowerUp(tileMap, initialX - 40, initialY + 20, 30, 30, textures[9]);
-
-    // animateEnemy(0);
     animateEnemy(0);
     animateEnemy(1);
     animateEnemy(2);
     animateEnemy(3);
 }
 
-/*
- *  Declare initial window size, position, and display mode
- *  (single buffer and RGBA).  Open window with "hello"
- *  in its title bar.  Call initialization routines.
- *  Register callback function to display graphics.
- *  Enter main loop and process events.
- */
+void loadGame() {
+    createMap();
+    createCharacter();
+    createRuby();
+    createEnemies();
+}
+
 int main(int argc, char** argv)
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutInitWindowSize(800, 600);
     glutInitWindowPosition(100, 100);
-    glutCreateWindow("OpenGoal");
+    glutCreateWindow("Hunting for Rubies");
     init();
     glutDisplayFunc(display);
     // glutKeyboardFunc(keyboard);
     glutSpecialFunc(keyboardCommands);
     glutMouseFunc(mouse);
 
-    glGenTextures(20, textures);
-
-    loadTexture(textures[0], "images/grass.ptm");
-    loadTexture(textures[1], "images/rock.ptm");
-    loadTexture(textures[2], "images/charSE.ptm");
-    loadTexture(textures[3], "images/enemy.ptm");
-    loadTexture(textures[4], "images/tree.ptm");
-    loadTexture(textures[5], "images/selected.ptm");
-    loadTexture(textures[6], "images/gameover.ptm");
-    loadTexture(textures[7], "images/truck.ptm");
-    loadTexture(textures[8], "images/sphere.ptm");
-    loadTexture(textures[9], "images/powerup.ptm");
-
-    // character textures
-    loadTexture(textures[10], "images/charN.ptm");
-    loadTexture(textures[11], "images/charS.ptm");
-    loadTexture(textures[12], "images/charSE.ptm");
-    loadTexture(textures[13], "images/charN.ptm");
-    loadTexture(textures[14], "images/charS.ptm");
-    loadTexture(textures[15], "images/charSE.ptm");
-    loadTexture(textures[16], "images/charS.ptm");
-    loadTexture(textures[17], "images/charSE.ptm");
+    loadAllTextures();
+    loadGame();
 
 
-    // int map[100];
-    // for(int i = 0; i < 100; i++) {
-    //     if(i < 10){
-    //         map[i] = textures[1];
-    //     } else {
-    //         map[i] = textures[0];
-    //     }
-
-    // }
-
-    // map[2] = textures[1];
-    // // map[12] = textures[1];
-    // // map[44] = textures[1];
-
-    int map[100] = {textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1],
-        textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
-        textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
-        textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
-        textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
-        textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
-        textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
-        textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
-        textures[1], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[0], textures[1],
-        textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1], textures[1]};
-
-    tileMap = new TileMap(10, 10, tileWidth, tileHeight, initialX, initialY,
-                            textures[5], textures[1], map);
-
-
-    character = new Character(tileMap, initialX, initialY, 30, 60, textures[2]);
     // enemy = new Enemy(tileMap, initialX + 50, initialY + 20, 30, 60, textures[3]);
     // enemy = new Enemy(tileMap, 280, 210, 100, 80, textures[7]);
 
-    createEnemies();
+
 
     glutMainLoop();
 

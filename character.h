@@ -1,11 +1,11 @@
 class Character {
     public:
-      Character(TileMap *tp, int px, int py, int w, int h, int t){
+      Character(TileMap *tp, int px, int py, int w, int h, std::vector<int> t){
         x = px; y = py;
         width = w; height = h;
-        texture = t;
+        textures = t;
         tileMap = tp;
-        power = 0;
+        direction = 5;
       }
 
       // current anchor x and y for colision
@@ -16,13 +16,7 @@ class Character {
       // get a real Y position
       int getY(){ return height-5 + y; }
 
-      int getTexture() { return texture; }
-
-      int getPower() { return power; }
-
-      void setPower(int p) {
-        power = p;
-      }
+      int getTexture() { return textures[direction]; }
 
       int getTileX() {
         return tileX;
@@ -43,27 +37,6 @@ class Character {
       void setDirection(int d) {
         direction = d;
       }
-
-      // void move(unsigned char direction) {
-      //   switch(direction) {
-      //     case 'N':
-      //       y -= 10;
-      //       break;
-      //     case 'S':
-      //       y += 10;
-      //       break;
-      //     case 'W':
-      //       x -= 10;
-      //       break;
-      //     case 'E':
-      //       x += 10;
-      //       break;
-      //   }
-
-      //   Tile t = tileMap->getNearest(getX(), getY());
-      //   tileY = t.getY();
-      //   tileX = t.getX();
-      // }
 
       /* DIRECTIONS:
           - 0 = north
@@ -114,27 +87,27 @@ class Character {
           Tile tile = tileMap->getNearest(getX(), getY());
           tileY = tile.getY();
           tileX = tile.getX();
-        // }pop
+        // }
 
       }
 
       void render() {
-          // glColor3d (0.5, 0.5, 0.7);
-        glBindTexture( GL_TEXTURE_2D, texture);
-          glBegin(GL_POLYGON);
-              glTexCoord2d(0, 0);
-              glVertex3f (x + 0, y + 0, 0.0);
-              glTexCoord2d(1, 0);
-              glVertex3f (x + width, y + 0, 0.0);
-              glTexCoord2d(1, 1);
-              glVertex3f (x + width, y + height, 0.0);
-              glTexCoord2d(0, 1);
-              glVertex3f (x + 0, y + height, 0.0);
-          glEnd();
+        glBindTexture( GL_TEXTURE_2D, getTexture());
+        glBegin(GL_POLYGON);
+          glTexCoord2d(0, 0);
+          glVertex3f (x + 0, y + 0, 0.0);
+          glTexCoord2d(1, 0);
+          glVertex3f (x + width, y + 0, 0.0);
+          glTexCoord2d(1, 1);
+          glVertex3f (x + width, y + height, 0.0);
+          glTexCoord2d(0, 1);
+          glVertex3f (x + 0, y + height, 0.0);
+        glEnd();
       }
 
     private:
-      int x, y, width, height, texture, tileX, tileY, direction, power;
+      int x, y, width, height, tileX, tileY, direction;
+      std::vector<int> textures;
       TileMap *tileMap;
 
 };
