@@ -49,8 +49,6 @@ class Character {
           - 7 = nw
       */
       void move() {
-        // Tile tile = tileMap->getNearest(getX(), getY());
-        // if(tileMap->getBoundaryTexture() != tile.getTexture()) {
           switch(direction) {
             case 0:
               y -= 10;
@@ -82,12 +80,10 @@ class Character {
               break;
           }
 
-
           // find current tile
           Tile tile = tileMap->getNearest(getX(), getY());
           tileY = tile.getY();
           tileX = tile.getX();
-        // }
 
       }
 

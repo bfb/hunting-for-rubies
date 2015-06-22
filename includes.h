@@ -8,6 +8,7 @@
 #include <vector>
 #include "image.h"
 #include "tile.h"
+#include "diamond_view.h"
 #include "tile_map.h"
 #include "character.h"
 #include "enemy.h"

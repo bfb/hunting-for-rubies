@@ -79,7 +79,6 @@ void loadTexture(GLuint texture, std::string filename){
     std::string a;
 
     Image *image = new Image(std::stoi(width), std::stoi(height));
-    // image = new Image(std::stoi(width), std::stoi(height));
 
     for(int y = 0; y < image->getHeight(); y++) {
         for(int x = 0; x < image->getWidth(); x++) {
@@ -89,12 +88,6 @@ void loadTexture(GLuint texture, std::string filename){
           inf >> b;
 
           int rgb = (std::stoi(a) << 24) | (std::stoi(r) << 16) | (std::stoi(g) << 8) | std::stoi(b);
-          // int rgb = (std::stoi(r) << 24) | (std::stoi(g) << 16) | (std::stoi(b) << 8) | (std::stoi(a));
-
-
-
-          // int rgb = (std::stoi(r) << 16) | (std::stoi(g) << 8) | std::stoi(b) | (std::stoi(a) << 24);
-          // int rgb = (std::stoi(r) << 24) | (std::stoi(g) << 16) | std::stoi(b) << 8 | (std::stoi(a) << 24);
 
           image->setPixel(rgb, x, y);
         }
@@ -234,18 +227,7 @@ void display(void) {
         }
     }
 
-
-
     ruby->render();
-
-    // if(character->getX() + 20 < tree->getX() ||
-    //        character->getY() < tree->getY()){
-    //     character->render();
-    //     tree->render();
-    // } else {
-    //     tree->render();
-    //     character->render();
-    // }
 
     character->render();
 
@@ -257,12 +239,7 @@ void display(void) {
         }
     }
 
-    // for(int i = 0; i < enemies.size(); i++) {
-    //     enemies.at(i).render();
-    // }
-
     tree->render();
-
 
     glFlush ();
 }
@@ -325,11 +302,14 @@ void loadAllTextures() {
 void createMap() {
     int map[cols*rows];
 
+    // get textures
     for(int i = 0; i < mapFile.size(); i++) {
         map[i] = textures[mapFile[i]];
     }
 
-    tileMap = new TileMap(cols, rows, tileWidth, tileHeight, initialX, initialY,
+    DiamondView *view = new DiamondView(rows, cols, initialX, initialY);
+
+    tileMap = new TileMap(view, tileWidth, tileHeight,
                             textures[5], textures[1], map);
 
     tree = new Tree(240, 270, 80, 110, textures[4]);
@@ -434,19 +414,9 @@ int main(int argc, char** argv)
     glutSpecialFunc(keyboardCommands);
     glutMouseFunc(mouse);
 
-
-
     loadAllTextures();
     loadMapFile("map.txt");
     loadGame();
-
-
-
-
-    // enemy = new Enemy(tileMap, initialX + 50, initialY + 20, 30, 60, textures[3]);
-    // enemy = new Enemy(tileMap, 280, 210, 100, 80, textures[7]);
-
-
 
     glutMainLoop();
 
