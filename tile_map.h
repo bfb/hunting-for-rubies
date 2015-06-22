@@ -29,6 +29,7 @@ class TileMap {
 
               // Tile *tile = new Tile(xx, yy, m[i*j]);
               Tile *tile = new Tile(xx, yy);
+              tile->setTexture(m[i+j*cols]);
 
               // std::cout << xx << "x" << yy << " = ";
               // std::cout << tile->getX() << "x" << tile->getY() << " Texture: " << tile->getTexture() << "\n";
@@ -37,9 +38,9 @@ class TileMap {
             }
         }
 
-        for(int i = 0; i < map.size(); i ++) {
-          map.at(i).setTexture(m[i]);
-        }
+        // for(int i = 0; i < map.size(); i ++) {
+        //   map.at(i).setTexture(m[i]);
+        // }
       }
 
 

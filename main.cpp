@@ -302,17 +302,26 @@ void loadAllTextures() {
 }
 
 void createMap() {
-
-    int map[100] = {textures[1], textures[1], textures[1], textures[1], textures[18], textures[1], textures[1], textures[1], textures[1], textures[1],
-                    textures[1], textures[0], textures[21], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
-                    textures[19], textures[19], textures[19], textures[19], textures[2], textures[19], textures[19], textures[19], textures[19], textures[19],
-                    textures[1], textures[0], textures[0], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
-                    textures[1], textures[0], textures[0], textures[0], textures[18], textures[0], textures[0], textures[7], textures[0], textures[1],
-                    textures[1], textures[20], textures[0], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
-                    textures[1], textures[0], textures[0], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
-                    textures[1], textures[7], textures[0], textures[0], textures[18], textures[0], textures[21], textures[0], textures[0], textures[1],
-                    textures[1], textures[0], textures[0], textures[20], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
-                    textures[1], textures[1], textures[1], textures[1], textures[18], textures[1], textures[1], textures[1], textures[1], textures[1]};
+int map[100] = {textures[1], textures[1], textures[1], textures[1], textures[19], textures[1], textures[1], textures[1], textures[1], textures[1],
+                    textures[1], textures[0], textures[21], textures[0], textures[19], textures[0], textures[0], textures[0], textures[0], textures[1],
+                    textures[18], textures[18], textures[18], textures[18], textures[2], textures[18], textures[18], textures[18], textures[18], textures[18],
+                    textures[1], textures[0], textures[0], textures[0], textures[19], textures[0], textures[0], textures[0], textures[0], textures[1],
+                    textures[1], textures[0], textures[0], textures[0], textures[19], textures[0], textures[0], textures[7], textures[0], textures[1],
+                    textures[1], textures[20], textures[0], textures[0], textures[19], textures[0], textures[0], textures[0], textures[0], textures[1],
+                    textures[1], textures[0], textures[0], textures[0], textures[19], textures[0], textures[0], textures[0], textures[0], textures[1],
+                    textures[1], textures[7], textures[0], textures[0], textures[19], textures[0], textures[21], textures[0], textures[0], textures[1],
+                    textures[1], textures[0], textures[0], textures[20], textures[19], textures[0], textures[0], textures[0], textures[0], textures[1],
+                    textures[1], textures[1], textures[1], textures[1], textures[19], textures[1], textures[1], textures[1], textures[1], textures[1]};
+    // int map[100] = {textures[1], textures[1], textures[1], textures[1], textures[18], textures[1], textures[1], textures[1], textures[1], textures[1],
+    //                 textures[1], textures[0], textures[21], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
+    //                 textures[19], textures[19], textures[19], textures[19], textures[2], textures[19], textures[19], textures[19], textures[19], textures[19],
+    //                 textures[1], textures[0], textures[0], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
+    //                 textures[1], textures[0], textures[0], textures[0], textures[18], textures[0], textures[0], textures[7], textures[0], textures[1],
+    //                 textures[1], textures[20], textures[0], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
+    //                 textures[1], textures[0], textures[0], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
+    //                 textures[1], textures[7], textures[0], textures[0], textures[18], textures[0], textures[21], textures[0], textures[0], textures[1],
+    //                 textures[1], textures[0], textures[0], textures[20], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
+    //                 textures[1], textures[1], textures[1], textures[1], textures[18], textures[1], textures[1], textures[1], textures[1], textures[1]};
 
     tileMap = new TileMap(cols, rows, tileWidth, tileHeight, initialX, initialY,
                             textures[5], textures[1], map);
