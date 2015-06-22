@@ -312,20 +312,9 @@ int map[100] = {textures[1], textures[1], textures[1], textures[1], textures[19]
                     textures[1], textures[7], textures[0], textures[0], textures[19], textures[0], textures[21], textures[0], textures[0], textures[1],
                     textures[1], textures[0], textures[0], textures[20], textures[19], textures[0], textures[0], textures[0], textures[0], textures[1],
                     textures[1], textures[1], textures[1], textures[1], textures[19], textures[1], textures[1], textures[1], textures[1], textures[1]};
-    // int map[100] = {textures[1], textures[1], textures[1], textures[1], textures[18], textures[1], textures[1], textures[1], textures[1], textures[1],
-    //                 textures[1], textures[0], textures[21], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
-    //                 textures[19], textures[19], textures[19], textures[19], textures[2], textures[19], textures[19], textures[19], textures[19], textures[19],
-    //                 textures[1], textures[0], textures[0], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
-    //                 textures[1], textures[0], textures[0], textures[0], textures[18], textures[0], textures[0], textures[7], textures[0], textures[1],
-    //                 textures[1], textures[20], textures[0], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
-    //                 textures[1], textures[0], textures[0], textures[0], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
-    //                 textures[1], textures[7], textures[0], textures[0], textures[18], textures[0], textures[21], textures[0], textures[0], textures[1],
-    //                 textures[1], textures[0], textures[0], textures[20], textures[18], textures[0], textures[0], textures[0], textures[0], textures[1],
-    //                 textures[1], textures[1], textures[1], textures[1], textures[18], textures[1], textures[1], textures[1], textures[1], textures[1]};
-
-    tileMap = new TileMap(cols, rows, tileWidth, tileHeight, initialX, initialY,
-                            textures[5], textures[1], map);
-
+    
+    View *view = new DiamondView(rows, cols, initialX, initialY);
+    tileMap = new TileMap(view, tileWidth, tileHeight, textures[5], textures[1], map);
     tree = new Tree(240, 270, 80, 110, textures[4]);
 }
 
@@ -415,8 +404,7 @@ void loadGame() {
     createEnemies();
 }
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
     glutInitWindowSize(800, 600);
@@ -424,21 +412,11 @@ int main(int argc, char** argv)
     glutCreateWindow("Hunting for Rubies");
     init();
     glutDisplayFunc(display);
-    // glutKeyboardFunc(keyboard);
     glutSpecialFunc(keyboardCommands);
     glutMouseFunc(mouse);
-
     loadAllTextures();
     loadGame();
-
-
-    // enemy = new Enemy(tileMap, initialX + 50, initialY + 20, 30, 60, textures[3]);
-    // enemy = new Enemy(tileMap, 280, 210, 100, 80, textures[7]);
-
-
-
     glutMainLoop();
-
     return 0;   /* ISO C requires main to return int. */
 }
 

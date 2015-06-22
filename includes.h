@@ -1,6 +1,4 @@
-#include <OpenGL/gl.h>
- #include <OpenGL/glu.h>
-#include <GLUT/glut.h>
+#include <GL/glut.h>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -8,6 +6,8 @@
 #include <vector>
 #include "image.h"
 #include "tile.h"
+#include "view.h"
+#include "diamond_view.h"
 #include "tile_map.h"
 #include "character.h"
 #include "enemy.h"
