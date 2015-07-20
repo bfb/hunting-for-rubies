@@ -45,42 +45,6 @@ class Image {
         }
 
 
-
-
-
-
-        // // working
-        // for(int x = 0; x < image.getHeight(); x++){
-        //   for(int y = 0; y < image.getWidth(); y++){
-        //     // int pixel = image.getPixel(x, y);
-        //     // if(pixel )
-        //     setPixel(image.getPixel(image.getHeight() - 1 - x, image.getWidth() - 1 - y), startX + y, startY + x);
-        //   }
-        // }
-
-
-
-
-        // // okk
-        // for(int x = 0; x < image.getHeight(); x++){
-        //   for(int y = 0; y < image.getWidth(); y++){
-        //     // int pixel = image.getPixel(x, y);
-        //     // if(pixel )
-        //     setPixel(image.getPixel(image.getHeight() - 1 - x, image.getWidth() - 1 - y), startX + y, startY + x);
-        //   }
-        // }
-
-        // for(int x = 0; x < image.getHeight(); x++){
-        //   for(int y = 0; y < image.getWidth(); y++){
-        //     // int pixel = image.getPixel(x, y);
-        //     // if(pixel )
-        //     setPixel(image.getPixel(image.getHeight() - 1 - x, image.getWidth() - 1 - y), startX + y, startY + x);
-        //   }
-        // }
-
-
-
-
       }
 
     private:
